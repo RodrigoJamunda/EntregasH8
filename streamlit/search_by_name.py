@@ -4,12 +4,9 @@ def run_name_search(data):
     """
     Executa o formulário de busca por nome
 
-    :param data: dataframe base
-    :return: void
+    :param data: pd.DataFrame, dataframe base
+    :return: str, nome da pessoa encontrada
     """
-
-    # Escreve as instruções na tela
-    st.write("Insira os dados da entrega:")
 
     # Cria uma caixa de escolha para selecionar o nome
     name_selected = st.selectbox(label="Nome", options=sorted(data["Nome"].unique()),
@@ -19,8 +16,8 @@ def run_name_search(data):
     is_button_inactive = name_selected is None
 
     # Cria um botão para buscar os dados
-    search_button = st.button(label="Buscar", disabled=is_button_inactive)
+    search_button = st.button(label="Buscar", disabled=is_button_inactive, type="primary")
 
     # Se o botão for pressionado
     if search_button:
-        st.write("Enviado!")
+        return name_selected

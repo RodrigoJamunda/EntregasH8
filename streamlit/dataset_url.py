@@ -8,10 +8,9 @@ def get_url():
     """
     Retorna o URL da planilha que contém os dados do projeto.
 
-    Parâmetros: Nenhum
-
-    Retorna:
-    - URL: URL da planilha solicitada.
+    :param sheet_url: str, o URL do documento
+    :param sheet_name: str, o nome da planilha específica convertida (default: None, corresponde à primeira planilha)
+    :return: str, URL da planilha solicitada.
     """
 
     return _url
