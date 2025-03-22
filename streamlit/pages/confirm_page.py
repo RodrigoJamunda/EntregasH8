@@ -1,5 +1,8 @@
-import streamlit as st
+import sys
+sys.path.append("..")
 from session_state import get_session_state
+
+import streamlit as st
 
 def hide_format(string):
     """
@@ -48,7 +51,7 @@ def print_data(data):
              f"Email: {hide_format(data['Email'].item())}")
     return
 
-def process_data(data, person):
+def process_data(data, person_id):
     """
     Converte um nome ou uma lista de nomes em uma linha de dataframe
 
@@ -56,18 +59,18 @@ def process_data(data, person):
     :param person: str ou list, nome ou nomes das pessoas a serem processadas
     :return: void
     """
-    if type(person) is not list:
+    if type(person_id) is not list:
         st.divider()
 
-        person_data = data[data["Nome"] == person]
+        person_data = data[data["ID"] == person_id]
         print_data(person_data)
 
         st.divider()
         return
 
     st.divider()
-    for name in person:
-        person_data = data[data["Nome"] == name]
+    for id in person_id:
+        person_data = data[data["ID"] == id]
         print_data(person_data)
 
         st.divider()
@@ -84,7 +87,7 @@ def main():
     )
 
     # Se a busca não foi realizada, retorna à página inicial
-    if get_session_state("person") is None:
+    if get_session_state("person_id") is None:
         st.switch_page("main_page.py")
 
     # Configura o título da página
@@ -95,10 +98,10 @@ def main():
 
     # Extrai os dados da st.session_state
     data = get_session_state("data")
-    person = get_session_state("person")
+    person_id = get_session_state("person_id")
 
     # Imprime os dados na tela
-    process_data(data, person)
+    process_data(data, person_id)
 
     # Cria um botão para confirmar os dados
     confirm_button = st.button(label="Enviar notificação", type="primary")

@@ -2,7 +2,7 @@ import streamlit as st
 import pandas as pd
 
 @st.cache_data
-def get_ap_data(data):
+def get_ap_data(data: pd.DataFrame) -> pd.DataFrame:
     """
     Converte o dataframe base em um dataframe com os dados concatenados em duas colunas
 
@@ -10,13 +10,13 @@ def get_ap_data(data):
     :return: pd.DataFrame, dataframe modificada
     """
 
-    data_ap = pd.DataFrame(columns=["Apartamento", "Vaga", "Nome"])
+    data_ap = pd.DataFrame(columns=["ID", "Apartamento", "Vaga", "Nome"])
     for index, row in data.iterrows():
-        data_ap.loc[index] = [f"H8{row["Bloco"]} {row["Apartamento"]}", f"{row["Vaga"]} - {row["Nome"]}", row["Nome"]]
+        data_ap.loc[index] = [row["ID"], f"H8{row["Bloco"]} {row["Apartamento"]}", f"{row["Vaga"]} - {row["Nome"]}", row["Nome"]]
 
     return data_ap
 
-def get_person(data, ap, vaga, not_include_vaga):
+def get_person_id(data: pd.DataFrame, ap: str, vaga: str, not_include_vaga: bool) -> int | list:
     """
     Extrai o nome da pessoa buscada
 
@@ -24,19 +24,19 @@ def get_person(data, ap, vaga, not_include_vaga):
     :param ap: str, apartamento da pessoa buscada
     :param vaga: str, vaga da pessoa buscada
     :param not_include_vaga: bool, parametro que controla se a vaga está preenchida ou não
-    :return: str ou list, pessoa ou pessoas buscadas
+    :return: int ou list, ID da pessoa ou pessoas buscadas
     """
 
     if not_include_vaga:
-        return data[data["Apartamento"] == ap]["Nome"].tolist()
-    return data[(data["Apartamento"] == ap) & (data["Vaga"] == vaga)]["Nome"].item();
+        return data[data["Apartamento"] == ap]["ID"].tolist()
+    return data[(data["Apartamento"] == ap) & (data["Vaga"] == vaga)]["ID"].item();
 
-def run_ap_search(data):
+def run_ap_search(data: pd.DataFrame) -> int | list:
     """
     Executa o formulário de busca por apartamento
 
     :param data: pd.DataFrame, dataframe base
-    :return: str ou list, nome ou nomes das pessoas encontradas
+    :return: int ou list, ID ou IDs das pessoas encontradas
     """
 
     # Cria um dataframe modificado e o armazena no cache
@@ -69,4 +69,4 @@ def run_ap_search(data):
 
     # Se o botão for pressionado
     if search_button:
-        return get_person(data_ap, ap_selected, vaga_selected, not_include_vaga)
+        return get_person_id(data_ap, ap_selected, vaga_selected, not_include_vaga)
