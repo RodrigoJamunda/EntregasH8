@@ -1,6 +1,10 @@
 import sys
+
+from streamlit import switch_page
+
 sys.path.append("..")
-from session_state import get_session_state
+from session_state import get_session_state, set_session_state
+from send_email import notify
 
 import streamlit as st
 
@@ -112,7 +116,11 @@ def main():
     # Se o botão de confirmar for pressionado
     if confirm_button:
         # Envia os dados
-        st.write("Enviado!")
+        with st.spinner("Enviando..."):
+            notify(data, person_id)
+
+        set_session_state("sent_message", True)
+        st.switch_page(r"main_page.py")
 
     # Se o botão de retornar for pressionado
     if go_back_button:

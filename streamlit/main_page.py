@@ -1,10 +1,11 @@
-import os
+import os, sys
 import streamlit as st
 import pandas as pd
 from search_by_ap import run_ap_search
 from search_by_name import run_name_search
 from search_by_cam import run_camera_search
-from session_state import init_session_state, set_session_state
+from session_state import init_session_state, set_session_state, get_session_state
+sys.path.append(__file__)
 
 def get_url(filename: str) -> str:
     """
@@ -64,6 +65,9 @@ def main():
     init_session_state("data", data)
     init_session_state("person", None)
 
+    if get_session_state("sent_message"):
+        st.success("Notificação enviada com sucesso!")
+
     # Escreve na tela as instruções
     st.subheader("Insira os dados da entrega")
 
@@ -79,8 +83,10 @@ def main():
         person_id = run_ap_search(data)
     elif search == "Buscar por nome":
         person_id = run_name_search(data)
-    else:
+    elif search == "Buscar usando a câmera":
         person_id = run_camera_search(data)
+    else:
+        person_id = None
 
     # Troca de página ao encontrar a pessoa
     if person_id:
