@@ -1,27 +1,9 @@
 import os
 from google import genai
 import pandas as pd
+import streamlit as st
 from .get_database import normalize_string, get_norm_database
 from rapidfuzz import fuzz, process
-
-def get_genai_key(filename: str) -> str:
-    """
-    Retorna a chave da API da Gemini AI
-
-    :param filename: str, o caminho relativo até o arquivo contendo a chave
-    :return: str, a chave da API
-    """
-
-    # Computa o caminho completo do arquivo
-    dirname = os.path.dirname(__file__)
-    full_path = os.path.join(dirname, filename)
-
-    # Abre o arquivo e retorna seu conteúdo
-    with open(full_path, 'r') as file:
-        api_key = file.read().strip()
-        if api_key == "":
-            raise FileNotFoundError("API key vazia! Certifique-se de preenchê-la antes de executar o código.")
-        return api_key
 
 def get_text_from_image(image) -> str:
     """
@@ -32,7 +14,7 @@ def get_text_from_image(image) -> str:
     """
 
     # Configura a API
-    client = genai.Client(api_key=get_genai_key('gemini_api_key.txt'))
+    client = genai.Client(api_key=st.secrets("gemini_api_key"))
 
     # Requisita a leitura da imagem
     response = client.models.generate_content(
