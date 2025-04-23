@@ -5,6 +5,7 @@ from streamlit import switch_page
 sys.path.append("..")
 from session_state import get_session_state, set_session_state
 from send_email import notify
+from database import update_database
 
 import streamlit as st
 
@@ -98,7 +99,7 @@ def main():
     st.title("Confirmar")
 
     # Escreve na tela as instruções
-    st.subheader("Confirme os dados para enviar a notificação da entrega:")
+    st.subheader("Confirme os dados para cadastrar a entrega:")
 
     # Extrai os dados da st.session_state
     data = get_session_state("data")
@@ -117,18 +118,16 @@ def main():
     if confirm_button:
         # Envia os dados
         with st.spinner("Enviando..."):
+            update_database(data, person_id, get_session_state("func_id"))
             notify(data, person_id)
 
-        set_session_state("sent_message", True)
+        set_session_state("sent_message", "Cadastro de entrega realizado com sucesso!")
         st.switch_page(r"main_page.py")
 
     # Se o botão de retornar for pressionado
     if go_back_button:
         # Retorna à página principal
         st.switch_page("main_page.py")
-
-
-
 
 if __name__ == "__main__":
     main()

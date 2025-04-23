@@ -52,7 +52,7 @@ def run_ap_search(data: pd.DataFrame) -> int | list:
     # Se algum apartamento for selecionado
     if ap_selected is not None:
         # Cria uma caixa de decisão para enviar notificações para todos do aparamento
-        not_include_vaga = st.checkbox("Notificar todos do apartamento")
+        not_include_vaga = st.checkbox("Buscar todas as vagas")
 
         # Filtra o dataframe com base no apartamento selecionado
         data_vaga = data_ap[data_ap["Apartamento"]==ap_selected]

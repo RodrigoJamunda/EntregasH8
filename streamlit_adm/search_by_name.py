@@ -22,7 +22,7 @@ def run_name_search(data: pd.DataFrame) -> int:
 
     # Cria uma caixa de escolha para selecionar o nome
     nome_selected = st.selectbox(label="Nome", options=sorted(data["Nome"].unique()),
-                               index=None, placeholder="Insira aqui o nome...")
+                               index=None, placeholder="Insira aqui o nome...", key="searchName")
 
     # Checa se o botão deve ficar desabilitado
     is_button_inactive = nome_selected is None

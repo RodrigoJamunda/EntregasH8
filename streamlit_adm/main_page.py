@@ -1,10 +1,11 @@
 import os, sys
 import streamlit as st
 import pandas as pd
-from search_by_ap import run_ap_search
-from search_by_name import run_name_search
-from search_by_cam import run_camera_search
 from session_state import init_session_state, set_session_state, get_session_state
+from func import func_options, get_func_id, get_func_index
+import cadastro_entrega, cadastro_retirada
+from streamlit_extras.stylable_container import stylable_container
+from sheets import get_data_from_sheets
 sys.path.append(__file__)
 
 def get_url(filename: str) -> str:
@@ -24,7 +25,7 @@ def get_url(filename: str) -> str:
         return file.read().strip()
 
 
-@st.cache_data
+@st.cache_data(show_spinner="Carregando dados...")
 def sheet_to_df(sheet_url: str, sheet_name: str | None = None) -> pd.DataFrame:
     """
     Converte uma planilha específica em um documento público do Google Sheets para um dataframe.
@@ -49,6 +50,13 @@ def sheet_to_df(sheet_url: str, sheet_name: str | None = None) -> pd.DataFrame:
 
     return df
 
+def get_data_from_csv(filename):
+    dirname = os.path.dirname(__file__)
+    full_path = os.path.join(dirname, filename)
+
+    return pd.read_csv(full_path)
+
+
 def main():
     # Configura o layout da aba da página
     st.set_page_config(
@@ -57,41 +65,52 @@ def main():
         initial_sidebar_state="collapsed"
     )
 
+    set_session_state("is_logged_in", False)
+
+    with stylable_container(
+        key="sc_main_page",
+        css_styles="""
+            button{
+                float: right;
+            }
+            """
+    ):
+        _, col1 = st.columns([7, 1])
+        with col1:
+            if st.button("LOGIN", type="secondary"):
+                    st.switch_page(r"pages/login_page.py")
+
     # Configura o título da página
     st.title("Entregas H8")
 
     # Extrai o dataframe base e o armazena no cache do site
-    data = sheet_to_df(get_url("dataset_url.txt"))
+
+    data = get_data_from_sheets("moradores")
     init_session_state("data", data)
     init_session_state("person", None)
 
-    if get_session_state("sent_message"):
-        st.success("Notificação enviada com sucesso!")
+    if get_session_state("sent_message") is not None:
+        message = get_session_state("sent_message")
+        st.success(message)
+        set_session_state("sent_message", None)
 
-    # Escreve na tela as instruções
-    st.subheader("Insira os dados da entrega")
+    func_index = get_func_index(get_session_state("func_id"))
 
-    # Cria uma caixa de escolha para que o usuário escolha buscar por apartamento ou por nome
-    # (default: buscar por apartamento)
-    search = st.pills(label="Busca", options=["Buscar por apartamento", "Buscar por nome", "Buscar usando a câmera"],
-                      selection_mode="single", default="Buscar por apartamento", label_visibility="hidden")
+    funcionario = st.selectbox(label="Nome", options=func_options(), index=func_index,
+                               placeholder="Insira aqui seu nome...")
 
-    st.divider()
+    if funcionario:
+        set_session_state("func_id", get_func_id(funcionario))
 
-    # Executa o script de cada opção
-    if search == "Buscar por apartamento":
-        person_id = run_ap_search(data)
-    elif search == "Buscar por nome":
-        person_id = run_name_search(data)
-    elif search == "Buscar usando a câmera":
-        person_id = run_camera_search(data)
-    else:
-        person_id = None
+        mode = st.pills(label="Busca", options=["Entrega", "Retirada"],
+                      selection_mode="single", default="Entrega", label_visibility="hidden")
 
-    # Troca de página ao encontrar a pessoa
-    if person_id:
-        set_session_state("person_id", person_id)
-        st.switch_page(r"pages/confirm_page.py")
+        if mode == "Entrega":
+            cadastro_entrega.cadastro(data)
+        elif mode == "Retirada":
+            cadastro_retirada.cadastro(data)
+        
+
 
 if __name__ == "__main__":
     main()

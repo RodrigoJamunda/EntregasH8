@@ -1,27 +1,8 @@
-import os
 import smtplib, ssl
 import pandas as pd
+import streamlit as st
 from email.message import EmailMessage
 from email.mime.text import MIMEText
-
-def get_password(filename: str) -> str:
-    """
-    Retorna a senha do e-mail do bot
-
-    :param filename: str, o caminho relativo até o arquivo contendo a senha
-    :return: str, a senha do e-mail
-    """
-
-    # Computa o caminho completo do arquivo
-    dirname = os.path.dirname(__file__)
-    full_path = os.path.join(dirname, filename)
-
-    # Abre o arquivo e retorna seu conteúdo
-    with open(full_path, "r") as file:
-        password = file.read().strip()
-        if password == "":
-            raise FileNotFoundError("Senha do e-mail vazia! Certifique-se de preenchê-la antes de executar o código.")
-        return password
 
 def get_address(data: pd.DataFrame, person_id: int | list) -> str | list:
     """
@@ -148,7 +129,7 @@ def notify(data: pd.DataFrame, person_id: int | list) -> None:
 
     # Extrai os dados de login do bot
     api_email = "bot.entregash8@gmail.com"
-    api_password = get_password("email_password.txt")
+    api_password = st.secrets["email_password"]
 
     # Extrai os dados da pessoa notificada
     target_email = get_address(data, person_id)
