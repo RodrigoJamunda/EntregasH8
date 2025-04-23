@@ -2,12 +2,12 @@ import os, sys
 import streamlit as st
 import pandas as pd
 
-sys.path.append("..")
+sys.path.append("../../streamlit_adm")
 from session_state import get_session_state
-from main_page import get_data_from_csv
+from sheets import get_data_from_sheets
 
 def process_data(data, person_id):
-    entregas_database = get_data_from_csv(r"entregas.csv")
+    entregas_database = get_data_from_sheets("entregas")
     processed_database = entregas_database[0:0]
     if type(person_id) == list:
         for id in person_id:
@@ -39,9 +39,12 @@ def main():
     person_id = get_session_state("person_id_user")
 
     if person_id is None:
-        st.switch_page(r"pages\user_page.py")
+        st.switch_page(r"user_page.py")
 
     process_data(data, person_id)
+
+    if st.button(label="Voltar", type="secondary"):
+        st.switch_page("user_page.py")
 
 if __name__ == '__main__':
     main()

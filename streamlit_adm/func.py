@@ -1,7 +1,9 @@
 import pandas as pd
+import streamlit as st
+from sheets import get_data_from_sheets, push_data_to_sheets
 
 def get_func_df():
-    return pd.read_csv("funcionarios.csv")
+    return get_data_from_sheets("funcionarios")
 
 def add_func(nome):
     func = get_func_df()
@@ -9,14 +11,14 @@ def add_func(nome):
     new_id = 0 if len(func) == 0 else func.iloc[-1]["ID"] + 1
     func.loc[len(func)] = [new_id, nome]
 
-    func.to_csv("funcionarios.csv", index=False)
+    push_data_to_sheets("funcionarios", func)
 
 def remove_func(nome):
     func = get_func_df()
 
     func.drop(func.index[func["Nome"]==nome], inplace=True)
 
-    func.to_csv("funcionarios.csv", index=False)
+    push_data_to_sheets("funcionarios", func)
 
 def func_options():
     func = get_func_df()

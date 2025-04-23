@@ -5,6 +5,7 @@ from session_state import init_session_state, set_session_state, get_session_sta
 from func import func_options, get_func_id, get_func_index
 import cadastro_entrega, cadastro_retirada
 from streamlit_extras.stylable_container import stylable_container
+from sheets import get_data_from_sheets
 sys.path.append(__file__)
 
 def get_url(filename: str) -> str:
@@ -55,6 +56,7 @@ def get_data_from_csv(filename):
 
     return pd.read_csv(full_path)
 
+
 def main():
     # Configura o layout da aba da página
     st.set_page_config(
@@ -73,19 +75,17 @@ def main():
             }
             """
     ):
-        _, col1, col2 = st.columns([6, 1, 1])
+        _, col1 = st.columns([7, 1])
         with col1:
             if st.button("LOGIN", type="secondary"):
                     st.switch_page(r"pages/login_page.py")
-        with col2:
-            if st.button("USER", type="secondary"):
-                st.switch_page(r"pages/user_page.py")
 
     # Configura o título da página
     st.title("Entregas H8")
 
     # Extrai o dataframe base e o armazena no cache do site
-    data = get_data_from_csv(r"moradores.csv")
+
+    data = get_data_from_sheets("moradores")
     init_session_state("data", data)
     init_session_state("person", None)
 

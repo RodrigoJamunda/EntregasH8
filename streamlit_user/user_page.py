@@ -1,11 +1,10 @@
 import os, sys
 import streamlit as st
 
-sys.path.append("..")
 from search_by_name import run_name_search
 from search_by_ap import run_ap_search
-from main_page import get_data_from_csv
 from session_state import set_session_state
+from sheets import get_data_from_sheets
 
 def main():
     st.set_page_config(
@@ -16,7 +15,7 @@ def main():
 
     st.title("Entregas H8")
 
-    data = get_data_from_csv(r"moradores.csv")
+    data = get_data_from_sheets("moradores")
     set_session_state("data", data)
 
     st.subheader("Insira os seus dados")

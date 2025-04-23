@@ -6,6 +6,7 @@ sys.path.append("..")
 from main_page import get_data_from_csv
 from session_state import get_session_state, set_session_state
 from database import update_ret
+from sheets import get_data_from_sheets
 
 def get_ret_data(data, entregas_data, person_id):
     ret_data_id = []
@@ -43,9 +44,11 @@ def main():
     )
 
     data = get_session_state("data")
-    entregas_data = get_data_from_csv("entregas.csv")
+    entregas_data = get_data_from_sheets("entregas")
     person_id = get_session_state("person_id_ret")
     name_ret = get_session_state("name_ret")
+
+    st.write(entregas_data)
 
     if person_id is None:
         st.switch_page("main_page.py")

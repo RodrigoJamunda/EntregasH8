@@ -4,10 +4,6 @@ from session_state import set_session_state
 from search_by_name import run_name_search
 from search_by_ap import run_ap_search
 
-def cadastro_database():
-    # Todo: COMO ENCONTRAR A PORRA DA ENTREGA?
-    pass
-
 def cadastro(data):
     st.subheader("Insira o nome do retirante")
 

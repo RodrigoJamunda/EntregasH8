@@ -1,11 +1,11 @@
-import pandas
-import pandas as pd
+import streamlit as st
 from datetime import datetime
 from func import get_func_name
 from random import randint
+from sheets import get_data_from_sheets, push_data_to_sheets
 
 def get_database():
-    return pd.read_csv("entregas.csv")
+    return get_data_from_sheets("entregas")
 
 def get_name(data, person_id):
     if type(person_id) is list:
@@ -41,14 +41,14 @@ def update_database(data, person_id, func_id):
                  None, datetime.now().strftime("%d/%m/%Y %H:%M:%S")]
     database.loc[len(database)] = new_entry
 
-    database.to_csv("entregas.csv", index=False)
+    push_data_to_sheets("entregas", database)
 
 def update_ret(name_ret, ids):
     database = get_database()
     for id in ids:
         database["Retirado por"].loc[database["ID"] == id] = name_ret
 
-    database.to_csv("entregas.csv", index=False)
+    push_data_to_sheets("entregas", database)
 
 def print_database():
     database = get_database()

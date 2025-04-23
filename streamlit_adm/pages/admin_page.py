@@ -1,19 +1,18 @@
 import os, sys
 import streamlit as st
 import pandas as pd
-import openpyxl as xl
+import openpyxl
 
 sys.path.append("..")
 from session_state import set_session_state, get_session_state
+from sheets import get_data_from_sheets
 
 def get_download_data():
     dirname = os.path.dirname(__file__)
-    full_path = os.path.join(dirname, r"..\entregas.csv")
     temp_path = os.path.join(dirname, r".\temp")
     sheet_path = os.path.join(dirname, r".\temp\sheet.xlsx")
 
-    df = pd.read_csv(full_path)
-
+    df = get_data_from_sheets("moradores")
     if not os.path.exists(sheet_path):
         os.mkdir(temp_path)
 
