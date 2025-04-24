@@ -3,7 +3,7 @@ from streamlit_gsheets import GSheetsConnection
 
 def get_url(sheet_name):
     if sheet_name == 'moradores':
-        return "https://docs.google.com/spreadsheets/d/1fRz_OI2e6Fh2v6stKWZIsb1dbu-23mThGEC4BdlSTj4/edit?usp=sharing"
+        return "https://docs.google.com/spreadsheets/d/1eXEpOJkSri7oGbDsBZ1qZ3BX-RBZY24mXc8znuKglYc/edit?usp=sharing"
     if sheet_name == 'funcionarios':
         return "https://docs.google.com/spreadsheets/d/1RKV0RzNmZ7oKhEJK6GQqVQUEnFCHkQXlXQE-RG1oBBM/edit?usp=sharing"
     if sheet_name == 'entregas':
@@ -14,6 +14,9 @@ def get_data_from_sheets(sheet_name):
     with st.spinner("Carregando dados..."):
         conn = st.connection("gsheets", type=GSheetsConnection)
         df = conn.read(spreadsheet=get_url(sheet_name))
+
+    if(sheet_name == 'moradores'):
+        df["Apartamento"] = df["Apartamento"].apply(lambda x:int(x))
 
     return df
 
