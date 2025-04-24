@@ -50,6 +50,9 @@ def main():
     if manage_data:
         st.switch_page(r"pages/data_page.py")
 
+    if st.button("Voltar à página inicial", type="secondary"):
+        st.switch_page("main_page.py")
+
 
 
 if __name__ == '__main__':
