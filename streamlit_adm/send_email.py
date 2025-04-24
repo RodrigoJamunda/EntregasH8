@@ -1,3 +1,4 @@
+import os, sys
 import smtplib, ssl
 import pandas as pd
 import streamlit as st
@@ -79,6 +80,8 @@ def get_message(sender: str, receiver: str, person: dict[str, str]) -> EmailMess
     :param person: tuple[str, str, str], variáveis de texto formatadas
     :return: EmailMessage, a mensagem de e-mail
     """
+
+    print(os.path.dirname(__file__))
 
     # Lê o template de e-mail e o formata com as variáveis
     with open(r"..\email_template.txt", "r") as content_message:
