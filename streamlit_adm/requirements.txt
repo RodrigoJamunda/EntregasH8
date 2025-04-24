@@ -5,3 +5,5 @@ numpy==2.0.2
 streamlit-extras==0.6.0
 pillow==11.1.0
 st-gsheets-connection==0.1.0
+google-genai==1.7.0
+RapidFuzz==3.12.2
