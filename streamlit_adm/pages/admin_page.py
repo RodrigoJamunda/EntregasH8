@@ -12,7 +12,7 @@ def get_download_data():
     temp_path = os.path.join(dirname, r".\temp")
     sheet_path = os.path.join(dirname, r".\temp\sheet.xlsx")
 
-    df = get_data_from_sheets("moradores")
+    df = get_data_from_sheets("entregas")
     if not os.path.exists(sheet_path):
         os.mkdir(temp_path)
 
@@ -28,7 +28,7 @@ def main():
     )
 
     if get_session_state("is_logged_in") == False:
-        st.switch_page(r"pages\login_page.py")
+        st.switch_page(r"pages/login_page.py")
 
     st.title("Área do administrador")
 

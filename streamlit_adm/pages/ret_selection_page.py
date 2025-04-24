@@ -48,8 +48,6 @@ def main():
     person_id = get_session_state("person_id_ret")
     name_ret = get_session_state("name_ret")
 
-    st.write(entregas_data)
-
     if person_id is None:
         st.switch_page("main_page.py")
 

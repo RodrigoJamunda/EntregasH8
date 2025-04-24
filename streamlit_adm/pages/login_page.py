@@ -27,7 +27,7 @@ def main():
         if submit_button:
             if check_password(entered_password):
                 set_session_state("is_logged_in", True)
-                st.switch_page(r"pages\admin_page.py")
+                st.switch_page(r"pages/admin_page.py")
             else:
                 st.error("Senha incorreta!")
 

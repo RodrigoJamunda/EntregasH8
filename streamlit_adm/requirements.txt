@@ -1,9 +1,9 @@
 streamlit==1.43.1
-pandas==2.2.3
-openpyxl==3.1.5
-numpy==2.0.2
 streamlit-extras==0.6.0
+pandas==2.2.3
+numpy==2.0.2
+google-genai==1.7.0
+openpyxl==3.1.5
 pillow==11.1.0
 st-gsheets-connection==0.1.0
-google-genai==1.7.0
 RapidFuzz==3.12.2
