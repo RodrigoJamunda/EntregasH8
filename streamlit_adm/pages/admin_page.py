@@ -28,7 +28,7 @@ def main():
     )
 
     if get_session_state("is_logged_in") == False:
-        st.switch_page(r"pages\login_page.py")
+        st.switch_page(r"pages/login_page.py")
 
     st.title("Área do administrador")
 
