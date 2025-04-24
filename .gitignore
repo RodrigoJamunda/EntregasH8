@@ -171,3 +171,6 @@ secrets.toml
 
 # Streamlit Cloud dev files
 .devcontainer
+
+# Temp files
+temp
