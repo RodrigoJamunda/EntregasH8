@@ -45,6 +45,11 @@ def main():
     st.download_button(label="Baixar planilha de entregas", file_name="entregas_h8.xlsx",
                        data=get_download_data(), on_click="rerun", icon=":material/download:", type="secondary")
 
+    manage_data = st.button(label="Excluir histórico de entregas", type="secondary")
+
+    if manage_data:
+        st.switch_page(r"pages/data_page.py")
+
 
 
 if __name__ == '__main__':

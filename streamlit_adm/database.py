@@ -1,7 +1,6 @@
 import streamlit as st
 from datetime import datetime
 from func import get_func_name
-from random import randint
 from sheets import get_data_from_sheets, push_data_to_sheets
 
 def get_database():
@@ -18,24 +17,10 @@ def get_name(data, person_id):
 
     return name
 
-def get_id(database, name):
-    initials = "".join([(word[0] if word[0].isupper() else "") for word in name.split(" ")])
-    if len(initials) <= 2:
-        initials = name[0:2].upper() + initials[-1]
-    else:
-        initials = initials[0:2] + initials[-1]
-
-    id = ""
-    while id == "" or database["ID"].isin([id]).any():
-        id = initials + datetime.now().strftime("%d%m") + "{:04d}".format(randint(0,9999))
-
-    return id
-
-def update_database(data, person_id, func_id):
+def update_database(data, person_id, func_id, new_id):
     database = get_database()
 
     new_name = get_name(data, person_id)
-    new_id = get_id(database, new_name)
 
     new_entry = [new_id, new_name, get_func_name(func_id),
                  None, datetime.now().strftime("%d/%m/%Y %H:%M:%S")]

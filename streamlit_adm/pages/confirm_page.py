@@ -1,11 +1,14 @@
 import sys
 
 from streamlit import switch_page
+from datetime import datetime
+from random import randint
 
 sys.path.append("..")
 from session_state import get_session_state, set_session_state
 from send_email import notify
 from database import update_database
+from sheets import get_data_from_sheets
 
 import streamlit as st
 
@@ -43,6 +46,22 @@ def hide_format(string):
 
     return format_str
 
+def get_ent_id(data, database, person_id):
+    if type(person_id) is list:
+        person_id = person_id[0]
+    name = data[data["ID"]==person_id]["Nome"].item()
+    initials = "".join([(word[0] if word[0].isupper() else "") for word in name.split(" ")])
+    if len(initials) <= 2:
+        initials = name[0:2].upper() + initials[-1]
+    else:
+        initials = initials[0:2] + initials[-1]
+
+    id = ""
+    while id == "" or database["ID"].isin([id]).any():
+        id = initials + datetime.now().strftime("%d%m") + "{:04d}".format(randint(0,9999))
+
+    return id
+
 def print_data(data):
     """
     Formata e imprime uma linha de um dataframe
@@ -56,7 +75,7 @@ def print_data(data):
              f"Email: {hide_format(data['Email'].item())}")
     return
 
-def process_data(data, person_id):
+def process_data(data, person_id, ent_id):
     """
     Converte um nome ou uma lista de nomes em uma linha de dataframe
 
@@ -71,6 +90,9 @@ def process_data(data, person_id):
         print_data(person_data)
 
         st.divider()
+
+        st.write(f"ID da entrega: **{ent_id}**")
+
         return
 
     st.divider()
@@ -79,6 +101,8 @@ def process_data(data, person_id):
         print_data(person_data)
 
         st.divider()
+
+    st.write(f"ID da entrega: **{ent_id}**")
 
     return
 
@@ -104,9 +128,16 @@ def main():
     # Extrai os dados da st.session_state
     data = get_session_state("data")
     person_id = get_session_state("person_id")
+    database = get_data_from_sheets("entregas")
+
+    if get_session_state("ent_id") is not None:
+        ent_id = get_session_state("ent_id")
+    else:
+        ent_id = get_ent_id(data, database, person_id)
+        set_session_state("ent_id", ent_id)
 
     # Imprime os dados na tela
-    process_data(data, person_id)
+    process_data(data, person_id, ent_id)
 
     # Cria um botão para confirmar os dados
     confirm_button = st.button(label="Enviar notificação", type="primary")
@@ -118,7 +149,7 @@ def main():
     if confirm_button:
         # Envia os dados
         with st.spinner("Enviando..."):
-            update_database(data, person_id, get_session_state("func_id"))
+            update_database(data, person_id, get_session_state("func_id"), ent_id)
             notify(data, person_id)
 
         set_session_state("sent_message", "Cadastro de entrega realizado com sucesso!")

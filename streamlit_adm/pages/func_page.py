@@ -49,6 +49,9 @@ def main():
     elif mode == "Remover funcionário":
         remocao()
 
+    if st.button("Cancelar", type="secondary"):
+        st.switch_page("pages/admin_page.py")
+
 
 
 if __name__ == "__main__":

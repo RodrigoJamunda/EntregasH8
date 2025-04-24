@@ -105,6 +105,8 @@ def main():
         mode = st.pills(label="Busca", options=["Entrega", "Retirada"],
                       selection_mode="single", default="Entrega", label_visibility="hidden")
 
+        set_session_state("ent_id", None)
+
         if mode == "Entrega":
             cadastro_entrega.cadastro(data)
         elif mode == "Retirada":
