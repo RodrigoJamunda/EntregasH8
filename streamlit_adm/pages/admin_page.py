@@ -37,15 +37,15 @@ def main():
         st.success(message)
         set_session_state("admin_message", None)
 
-    manage_func = st.button(label="Gerenciar funcionários", type="secondary")
+    manage_func = st.button(label="Gerenciar funcionários", type="primary")
 
     if manage_func:
         st.switch_page(r"pages/func_page.py")
 
     st.download_button(label="Baixar planilha de entregas", file_name="entregas_h8.xlsx",
-                       data=get_download_data(), on_click="rerun", icon=":material/download:", type="secondary")
+                       data=get_download_data(), on_click="rerun", icon=":material/download:", type="primary")
 
-    manage_data = st.button(label="Excluir histórico de entregas", type="secondary")
+    manage_data = st.button(label="Excluir histórico de entregas", type="primary")
 
     if manage_data:
         st.switch_page(r"pages/data_page.py")
