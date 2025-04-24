@@ -168,3 +168,6 @@ pyrightconfig.json
 
 # Streamlit secrets file
 secrets.toml
+
+# Streamlit Cloud dev files
+.devcontainer
