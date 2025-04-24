@@ -4,10 +4,9 @@ import pandas as pd
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
 
-from streamlit_user.session_state import set_session_state
-
 sys.path.append("..")
 from sheets import get_data_from_sheets, push_data_to_sheets
+from session_state import set_session_state
 
 def format_date(meses):
     if meses == 1:

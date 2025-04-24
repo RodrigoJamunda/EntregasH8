@@ -1,5 +1,6 @@
 import streamlit as st
 from datetime import datetime
+from dateutil.relativedelta import relativedelta
 from func import get_func_name
 from sheets import get_data_from_sheets, push_data_to_sheets
 
@@ -23,7 +24,7 @@ def update_database(data, person_id, func_id, new_id):
     new_name = get_name(data, person_id)
 
     new_entry = [new_id, new_name, get_func_name(func_id),
-                 None, datetime.now().strftime("%d/%m/%Y %H:%M:%S")]
+                 None, (datetime.now()+relativedelta(hours=-3)).strftime("%d/%m/%Y %H:%M:%S")]
     database.loc[len(database)] = new_entry
 
     push_data_to_sheets("entregas", database)

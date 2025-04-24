@@ -31,5 +31,8 @@ def main():
             else:
                 st.error("Senha incorreta!")
 
+    if st.button("Voltar", type="secondary"):
+        st.switch_page("main_page.py")
+
 if __name__ == "__main__":
     main()

@@ -81,10 +81,8 @@ def get_message(sender: str, receiver: str, person: dict[str, str]) -> EmailMess
     :return: EmailMessage, a mensagem de e-mail
     """
 
-    print(os.path.dirname(__file__))
-
     # Lê o template de e-mail e o formata com as variáveis
-    with open(r"..\email_template.txt", "r") as content_message:
+    with open(r"streamlit_adm/email_template.txt", "r") as content_message:
         content = MIMEText(content_message.read().format(**person), "html")
 
     # Cria um objeto correspondente à mensagem
