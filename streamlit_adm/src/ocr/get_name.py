@@ -14,7 +14,7 @@ def get_text_from_image(image) -> str:
     """
 
     # Configura a API
-    client = genai.Client(api_key=st.secrets("gemini_api_key"))
+    client = genai.Client(api_key=st.secrets["gemini_api_key"])
 
     # Requisita a leitura da imagem
     response = client.models.generate_content(
