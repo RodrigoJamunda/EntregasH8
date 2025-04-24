@@ -11,7 +11,6 @@ def get_url(sheet_name):
 
 @st.cache_data(show_spinner=False)
 def get_data_from_sheets(sheet_name):
-    st.write(get_url(sheet_name))
     with st.spinner("Carregando dados..."):
         conn = st.connection("gsheets", type=GSheetsConnection)
         df = conn.read(spreadsheet=get_url(sheet_name))
