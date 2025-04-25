@@ -18,6 +18,7 @@ def get_data_from_sheets(sheet_name):
     if(sheet_name == 'moradores'):
         df["Apartamento"] = df["Apartamento"].apply(lambda x:int(x))
 
+    st.cache_data.clear()
     return df
 
 def push_data_to_sheets(sheet_name, data):
