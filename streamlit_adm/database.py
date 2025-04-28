@@ -1,46 +1,87 @@
-import streamlit as st
+import pandas as pd
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
 from func import get_func_name
 from sheets import get_data_from_sheets, push_data_to_sheets
 
-def get_database():
-    return get_data_from_sheets("entregas")
+def get_database() -> pd.DataFrame:
+    """
+    Extrai a base de dados de entregas
 
-def get_name(data, person_id):
-    if type(person_id) is list:
-        names = []
-        for id in person_id:
-            names.append(data[data["ID"] == id]["Nome"].item())
-        name = ";".join(names)
-    else:
-        name = data[data["ID"] == person_id]["Nome"].item()
+    :return: pd.DataFrame, a base de dados de entregas
+    """
 
+    return get_data_from_sheets("entregas", clear_cache=True)
+
+def get_name(data_mor: pd.DataFrame, person_id: list) -> str:
+    """
+    Extrai o nome do destinatário ou destinatários
+
+    :param data_mor: pd.DataFrame, base de dados dos moradores
+    :param person_id: list, ID ou IDs dos destinatários
+    :return: str, os nomes dos destinatários
+    """
+
+    # Inicializa a lista de nomes
+    names = []
+
+    # Para cada destinatário
+    for id_mor in person_id:
+        # Adiciona o seu nome à lista
+        names.append(data_mor[data_mor["ID"] == id_mor]["Nome"].item())
+
+    # Formata os nomes em uma string
+    name = ";".join(names)
+
+    # Retorna a string formatada
     return name
 
-def update_database(data, person_id, func_id, new_id):
-    database = get_database()
+def update_database(data_mor: pd.DataFrame, person_id: list, func_id: int, id_enc: str) -> None:
+    """
+    Adiciona uma entrega à base de dados
 
-    new_name = get_name(data, person_id)
+    :param data_mor: pd.DataFrame, base de dados dos moradores
+    :param person_id: list, ID ou IDs dos destinatários
+    :param func_id: int, ID do funcionário que cadastrou a entrega
+    :param id_enc: ID da entrega
+    :return: None
+    """
 
-    new_entry = [new_id, new_name, get_func_name(func_id),
-                 None, (datetime.now()+relativedelta(hours=-3)).strftime("%d/%m/%Y %H:%M:%S")]
-    database.loc[len(database)] = new_entry
+    # Extrai a base de dados de entregas
+    data_ent = get_database()
 
-    push_data_to_sheets("entregas", database)
+    # Extrai o nome do destinatário ou destinatários
+    name_dest = get_name(data_mor, person_id)
 
-def update_ret(name_ret, ids):
-    database = get_database()
-    for id in ids:
-        database["Retirado por"].loc[database["ID"] == id] = name_ret
+    # Extrai a data do cadastro
+    date_ent =  datetime.now() + relativedelta(hours=-3)
 
-    push_data_to_sheets("entregas", database)
+    # Cria a nova linha da base de dados
+    new_entry = [id_enc, name_dest, get_func_name(func_id),
+                 None, date_ent.strftime("%d/%m/%Y %H:%M:%S")]
 
-def print_database():
-    database = get_database()
+    # Adiciona a nova linha à base de dados
+    data_ent.loc[len(data_ent)] = new_entry
 
-    print(database)
+    # Salva a base de dados atualizada
+    push_data_to_sheets("entregas", data_ent)
 
-if __name__ == "__main__":
-    for i in range(1, 1000):
-        print(get_id(get_database(), "Rodrigo Jamundá"))
+def update_ret(name_ret: str, ids: list) -> None:
+    """
+    Atualiza a retirada de entregas
+
+    :param name_ret: str, nome da retirada
+    :param ids: list, IDs das entregas retiradas
+    :return: None
+    """
+
+    # Extrai a base de dados de entregas
+    data_ent = get_database()
+
+    # Para cada entrega retirada
+    for id_ent in ids:
+        # Marca a retirada
+        data_ent["Retirado por"].loc[data_ent["ID"] == id_ent] = name_ret
+
+    # Salva a base de dados atualizada
+    push_data_to_sheets("entregas", data_ent)

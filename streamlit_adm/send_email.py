@@ -1,47 +1,42 @@
-import os, sys
 import smtplib, ssl
 import pandas as pd
 import streamlit as st
 from email.message import EmailMessage
 from email.mime.text import MIMEText
 
-def get_address(data: pd.DataFrame, person_id: int | list) -> str | list:
+def get_address(data_mor: pd.DataFrame, person_id: list) ->  list:
     """
-    Retorna o e-mail ou os e-mails das pessoas encontradas
+    Retorna o e-mail das pessoas encontradas
 
-    :param data: pd.DataFrame, a base de dados
-    :param person_id: int ou list, ID ou IDs da pessoas encontradas
-    :return: str ou list, e-mail ou e-mails das pessoas encontradas
+    :param data_mor: pd.DataFrame, base de dados de moradores
+    :param person_id: list, ID ou IDs da pessoas encontradas
+    :return: list, e-mail ou e-mails das pessoas encontradas
     """
 
-    # Se houver mais de um ID
-    if type(person_id) == list:
-        # Cria uma lista de e-mails
-        address_list = []
+    # Inicializa a lista de e-mails
+    address_list = []
 
-        # Insere o e-mail associado a cada ID na lista
-        for p_id in person_id:
-            address_list.append(data[data["ID"]==p_id]["Email"].item())
+    # Para cada destinatário
+    for id_mor in person_id:
+        # Adiciona o e-mail à lista
+        address_list.append(data_mor[data_mor["ID"]==id_mor]["Email"].item())
 
-        # Retorna a lista
-        return address_list
+    # Retorna a lista de e-mails
+    return address_list
 
-    # Se houver só um ID, retorna o e-mail associado a ele
-    return data[data["ID"]==person_id]["Email"].item()
-
-def get_data(data: pd.DataFrame, person_id: int | list) -> tuple[str, str, str]:
+def get_data(data_mor: pd.DataFrame, person_id: list) -> tuple[str, str, str]:
     """
     Retorna os dados formatados das pessoas encontradas
 
-    :param data: pd.DataFrame, a base de dados
-    :param person_id: int ou list, ID ou IDs da pessoas encontradas
+    :param data_mor: pd.DataFrame, base de dados de moradores
+    :param person_id: list, ID ou IDs da pessoas encontradas
     :return: tuple[str, str, str], dados formatados das pessoas encontradas
     """
 
     # Se houver mais de um ID
-    if type(person_id) == list:
+    if len(person_id) > 1:
         # Extrai os dados da primeira pessoa
-        person_data = data[data["ID"]==person_id[0]]
+        person_data = data_mor[data_mor["ID"]==person_id[0]]
 
         # Extrai os dados do apartamento
         ap = person_data["Apartamento"].item()
@@ -55,7 +50,7 @@ def get_data(data: pd.DataFrame, person_id: int | list) -> tuple[str, str, str]:
     # Se houver só um ID
     else:
         # Extrai os da pessoa correspondente
-        person_data = data[data["ID"] == person_id]
+        person_data = data_mor[data_mor["ID"]==person_id[0]]
 
         # Extrai os dados do apartamento, nome e vaga
         ap = person_data["Apartamento"].item()
@@ -71,18 +66,19 @@ def get_data(data: pd.DataFrame, person_id: int | list) -> tuple[str, str, str]:
     # Retorna as variáveis formatadas
     return primeiro_nome, dados, tipo
 
-def get_message(sender: str, receiver: str, person: dict[str, str]) -> EmailMessage:
+def get_message(sender: str, receiver: list, person: dict[str, str]) -> EmailMessage:
     """
     Cria um objeto contendo a mensagem de e-mail
 
     :param sender: str, e-mail do remetente
-    :param receiver: str, e-mail do destinatário
+    :param receiver: list, e-mail ou e-mails dos destinatários
     :param person: tuple[str, str, str], variáveis de texto formatadas
     :return: EmailMessage, a mensagem de e-mail
     """
 
     # Lê o template de e-mail e o formata com as variáveis
-    with open(r"streamlit_adm/email_template.txt", "r") as content_message:
+    # with open(r"streamlit_adm/email_template.txt", "r") as content_message:
+    with open(r"email_template.txt", "r") as content_message:
         content = MIMEText(content_message.read().format(**person), "html")
 
     # Cria um objeto correspondente à mensagem
@@ -92,19 +88,19 @@ def get_message(sender: str, receiver: str, person: dict[str, str]) -> EmailMess
     msg.set_content(content)
     msg["Subject"] = "Notificação de entrega"
     msg["From"] = sender
-    msg["To"] = receiver
+    msg["To"] = ", ".join(receiver)
 
     # Retorna o objeto contendo a mensagem
     return msg
 
-def send_email(msg: EmailMessage, sender: str, password: str, receiver: str) -> None:
+def send_email(msg: EmailMessage, sender: str, password: str, receiver: list) -> None:
     """
     Envia a mensagem para o e-mail dado
 
     :param msg: EmailMessage, a mensagem de e-mail a ser enviada
     :param sender: str, e-mail do remetente
     :param password: str, senha do e-mail do remetente
-    :param receiver: str, e-mail do destinatário
+    :param receiver: list, e-mail ou e-mails dos destinatários
     :return: None
     """
 
@@ -119,12 +115,12 @@ def send_email(msg: EmailMessage, sender: str, password: str, receiver: str) -> 
         # Envia a mensagem para o destinatário
         server.sendmail(sender, receiver, msg.as_string())
 
-def notify(data: pd.DataFrame, person_id: int | list) -> None:
+def notify(data_mor: pd.DataFrame, person_id: list) -> None:
     """
     Processa e envia a notificação para a pessoa encontrada
 
-    :param data: pd.DataFrame, a base de dados
-    :param person_id: int ou list, ID ou IDs da pessoas encontradas
+    :param data_mor: pd.DataFrame, base de dados de moradores
+    :param person_id: list, ID ou IDs das pessoas encontradas
     :return: None
     """
 
@@ -133,8 +129,8 @@ def notify(data: pd.DataFrame, person_id: int | list) -> None:
     api_password = st.secrets["email_password"]
 
     # Extrai os dados da pessoa notificada
-    target_email = get_address(data, person_id)
-    primeiro_nome, dados, tipo = get_data(data, person_id)
+    target_email = get_address(data_mor, person_id)
+    primeiro_nome, dados, tipo = get_data(data_mor, person_id)
     person = {"primeiro_nome": primeiro_nome, "dados": dados, "tipo": tipo}
 
     # Cria a mensagem a ser enviada
