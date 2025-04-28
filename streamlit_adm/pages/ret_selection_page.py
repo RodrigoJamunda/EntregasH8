@@ -61,7 +61,7 @@ def display_ret(data_mor: pd.DataFrame, data_ent: pd.DataFrame, person_id: list)
         data_ent = data_ent[data_ent["ID"] == data_ret[i]]["Data"].item()
 
         # Input de seleção de entregas
-        ret[i] = st.checkbox("{} ({})".format(data_ret[i], data_ent))
+        ret[i] = st.checkbox("{} ({})".format(data_ret[i], data_ent), key=f'ret_cb_{i}')
 
         # Se a entrega for selecionada
         if ret[i]:
