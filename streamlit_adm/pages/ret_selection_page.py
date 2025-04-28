@@ -83,7 +83,7 @@ def main():
 
     # Extrai os dados dos moradores, das entregas e das encomendas a serem retiradas
     data_mor = get_data_from_sheets("moradores")
-    data_ent = get_data_from_sheets("entregas")
+    data_ent = get_data_from_sheets("entregas", clear_cache=True)
     person_id = get_session_state("person_id_ret")
     name_ret = get_session_state("name_ret")
 
