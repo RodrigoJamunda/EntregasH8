@@ -33,7 +33,7 @@ def delete_data(time: int, keep_unret: bool) -> None:
     """
 
     # Extrai os dados das entregas
-    data_ent = get_data_from_sheets("entregas")
+    data_ent = get_data_from_sheets("entregas", clear_cache=True)
 
     # Calcula a data a partir da qual as encomendas serão excluídas
     base_date = datetime.now() - relativedelta(months=time)

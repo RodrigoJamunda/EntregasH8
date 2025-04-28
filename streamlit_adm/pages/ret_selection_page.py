@@ -35,8 +35,18 @@ def get_ret_data(data_mor: pd.DataFrame, data_ent: pd.DataFrame, person_id: list
         # Adiciona as encomendas à lista
         ret_data_id = ret_data_id + data_filtered
 
+    # Inicializa a lista de IDs sem repetição
+    ret_data_id_uniq = []
+
+    # Para cada ID
+    for id_ret in ret_data_id:
+        # Se o ID não está na lista
+        if id_ret not in ret_data_id_uniq:
+            # Adiciona o ID à lista
+            ret_data_id_uniq.append(id_ret)
+
     # Retorna a lista de IDs
-    return ret_data_id
+    return ret_data_id_uniq
 
 def display_ret(data_mor: pd.DataFrame, data_ent: pd.DataFrame, person_id: list) -> list:
     """
@@ -58,10 +68,10 @@ def display_ret(data_mor: pd.DataFrame, data_ent: pd.DataFrame, person_id: list)
     # Para cada entrega
     for i in range(len(data_ret)):
         # Extrai a data que a entrega foi cadastrada
-        data_ent = data_ent[data_ent["ID"] == data_ret[i]]["Data"].item()
+        data_ent_i = data_ent[data_ent["ID"] == data_ret[i]]["Data"].item()
 
         # Input de seleção de entregas
-        ret[i] = st.checkbox("{} ({})".format(data_ret[i], data_ent))
+        ret[i] = st.checkbox("{} ({})".format(data_ret[i], data_ent_i), key=f'ret_cb_{i}')
 
         # Se a entrega for selecionada
         if ret[i]:
@@ -83,7 +93,7 @@ def main():
 
     # Extrai os dados dos moradores, das entregas e das encomendas a serem retiradas
     data_mor = get_data_from_sheets("moradores")
-    data_ent = get_data_from_sheets("entregas")
+    data_ent = get_data_from_sheets("entregas", clear_cache=True)
     person_id = get_session_state("person_id_ret")
     name_ret = get_session_state("name_ret")
 
