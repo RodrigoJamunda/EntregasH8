@@ -1,35 +1,36 @@
-import pandas as pd
 import streamlit as st
+import pandas as pd
 
-def get_person_id(data: pd.DataFrame, nome: str) -> int:
+def get_person_id(data_mor: pd.DataFrame, nome: str) -> list:
     """
     Extrai o ID da pessoa buscada
 
-    :param data: pd.DataFrame, dataframe base
+    :param data_mor: pd.DataFrame, dataframe base
     :param nome: str, nome da pessoa buscada
-    :return: int, ID da pessoa buscada
+    :return: list, ID da pessoa buscada
     """
 
-    return data[data["Nome"]==nome]["ID"].item()
+    return data_mor[data_mor["Nome"]==nome]["ID"].tolist()
 
-def run_name_search(data: pd.DataFrame) -> int:
+def run_name_search(data_mor: pd.DataFrame) -> list | None:
     """
     Executa o formulário de busca por nome
 
-    :param data: pd.DataFrame, dataframe base
-    :return: int, ID da pessoa encontrada
+    :param data_mor: pd.DataFrame, dataframe base
+    :return: list ou None, ID da pessoa encontrada
     """
 
-    # Cria uma caixa de escolha para selecionar o nome
-    nome_selected = st.selectbox(label="Nome", options=sorted(data["Nome"].unique()),
+    # Input do nome
+    nome_selected = st.selectbox(label="Nome", options=sorted(data_mor["Nome"].unique()),
                                index=None, placeholder="Insira aqui o nome...", key="searchName")
 
-    # Checa se o botão deve ficar desabilitado
+    # Verifica se o botão está inativo
     is_button_inactive = nome_selected is None
 
-    # Cria um botão para buscar os dados
+    # Botão de envio do formulário
     search_button = st.button(label="Buscar", disabled=is_button_inactive, type="primary")
 
     # Se o botão for pressionado
     if search_button:
-        return get_person_id(data, nome_selected)
+        # Retorna o ID ou IDs das pessoas buscadas
+        return get_person_id(data_mor, nome_selected)

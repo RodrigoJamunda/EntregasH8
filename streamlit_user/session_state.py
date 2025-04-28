@@ -1,25 +1,13 @@
 import streamlit as st
 import typing
 
-def init_session_state(key: str, value: typing.Any) -> None:
-    """
-    Inicializa um valor no st.session_state, caso ele não tenha sido inicializado antes
-
-    :param key: chave do st.session_state
-    :param value: valor associado à chave
-    :return: None
-    """
-
-    if key not in st.session_state:
-        st.session_state[key] = value
-
 def set_session_state(key: str, value: typing.Any) -> None:
     """
     Altera um valor do st.session_state
 
     :param key: chave do st.session_state
     :param value: valor associado à chave
-    :return: void
+    :return: None
     """
 
     st.session_state[key] = value
