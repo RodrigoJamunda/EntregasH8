@@ -5,17 +5,18 @@ import pandas as pd
 
 sys.path.append("..")
 from session_state import get_session_state, set_session_state
+from send_email import notify_error
 from database import update_ret
 from sheets import get_data_from_sheets
 
-def get_ret_data(data_mor: pd.DataFrame, data_ent: pd.DataFrame, person_id: list) -> list | None:
+def get_ret_data(data_mor: pd.DataFrame, data_ent: pd.DataFrame, person_id: list) -> list:
     """
     Extrai os IDs das encomendas cadastradas para retirada
 
     :param data_mor: pd.DataFrame, base de dados dos moradores
     :param data_ent: pd.DataFrame, base de dados das entregas
     :param person_id: list, ID ou IDs dos destinatários
-    :return: list ou None, IDs das encomendas
+    :return: list, IDs das encomendas
     """
 
     # Inicialização da lista de IDs
@@ -116,14 +117,21 @@ def main():
 
     # Se o botão de cadastro for pressionado
     if submit_button:
-        # Atualiza a base de dados
-        update_ret(name_ret, ids)
+        try:
+            # Atualiza a base de dados
+            update_ret(name_ret, ids)
 
-        # Envia a mensagem de sucesso
-        set_session_state("sent_message", "Retirada cadastrada com sucesso!")
+            # Envia a mensagem de sucesso
+            set_session_state("sent_message", "Retirada cadastrada com sucesso!")
 
-        # Troca para a página principal
-        st.switch_page("main_page.py")
+            # Troca para a página principal
+            st.switch_page("main_page.py")
+
+        except Exception as err:
+            # Se ocorrer um erro, notifica o desenvolvedor
+            notify_error(err)
+            st.error(f"Erro ao cadastrar a retirada: {err}")
+            raise err
 
 if __name__ == '__main__':
     main()

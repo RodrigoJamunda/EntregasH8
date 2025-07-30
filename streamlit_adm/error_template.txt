@@ -1,0 +1,32 @@
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="Content-type" content="text/html; charset=UTF-8">
+    <link href='https://fonts.googleapis.com/css?family=Roboto' rel='stylesheet'>
+
+    <style>
+        .text {{
+                {{
+                font-size: 12pt;
+                font-family: Roboto;
+            }}
+        }}
+    </style>
+</head>
+
+<body>
+    <div class=text>
+        <p>ERRO - {time}</p><br>
+
+        <p>EXCEPTION FOUND:</p>
+        
+        <p>{error_name} - {error}</p><br>
+        
+        <p>STACK TRACE</p>
+        
+        <p>{stack_trace}</p>
+    </div>
+</body>
+
+</html>

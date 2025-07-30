@@ -3,8 +3,10 @@ import pandas as pd
 import streamlit as st
 from email.message import EmailMessage
 from email.mime.text import MIMEText
+from datetime import datetime
+import traceback
 
-def get_address(data_mor: pd.DataFrame, person_id: list) ->  list:
+def get_address(data_mor: pd.DataFrame, person_id: list[str]) ->  list:
     """
     Retorna o e-mail das pessoas encontradas
 
@@ -24,7 +26,7 @@ def get_address(data_mor: pd.DataFrame, person_id: list) ->  list:
     # Retorna a lista de e-mails
     return address_list
 
-def get_data(data_mor: pd.DataFrame, person_id: list) -> tuple[str, str, str]:
+def get_data(data_mor: pd.DataFrame, person_id: list[str]) -> tuple[str, str, str]:
     """
     Retorna os dados formatados das pessoas encontradas
 
@@ -66,34 +68,54 @@ def get_data(data_mor: pd.DataFrame, person_id: list) -> tuple[str, str, str]:
     # Retorna as variáveis formatadas
     return primeiro_nome, dados, tipo
 
-def get_message(sender: str, receiver: list, person: dict[str, str]) -> EmailMessage:
+def create_notification_message(person: dict[str, str]) -> MIMEText:
     """
-    Cria um objeto contendo a mensagem de e-mail
+    Cria um objeto contendo a mensagem de notificação
+    
+    :param person: dict[str, str], variáveis de texto formatadas
+    :return: MIMEText, conteúdo da mensagem de notificação
+    """
+    # Lê o template de e-mail e o formata com as variáveis
+    with open(r"streamlit_adm/email_template.txt", "r") as content_message:
+        content = MIMEText(content_message.read().format(**person), "html")
+    
+    return content
+
+def create_error_message(error: Exception) -> MIMEText:
+    with open(r"streamlit_adm/error_template.txt", "r") as content_message:
+        content = MIMEText(content_message.read().format(
+            time=datetime.now().strftime("%d/%m/%Y %H:%M:%S"),
+            error_name=type(error).__name__,
+            error=str(error),
+            stack_trace=traceback.format_exc()
+        ), "html")
+    
+    return content
+
+def get_message(sender: str, receiver: list[str], content: MIMEText,
+                subject: str) -> EmailMessage:
+    """
+    Cria um objeto contendo os parâmetros da mensagem de e-mail
 
     :param sender: str, e-mail do remetente
     :param receiver: list, e-mail ou e-mails dos destinatários
     :param person: tuple[str, str, str], variáveis de texto formatadas
+    :param subject: str, assunto do e-mail
     :return: EmailMessage, a mensagem de e-mail
     """
-
-    # Lê o template de e-mail e o formata com as variáveis
-    # with open(r"streamlit_adm/email_template.txt", "r") as content_message:
-    with open(r"streamlit_adm/email_template.txt", "r") as content_message:
-        content = MIMEText(content_message.read().format(**person), "html")
-
     # Cria um objeto correspondente à mensagem
     msg = EmailMessage()
 
     # Insere os parâmetros da mensagem
     msg.set_content(content)
-    msg["Subject"] = "Notificação de entrega"
+    msg["Subject"] = subject
     msg["From"] = sender
     msg["To"] = ", ".join(receiver)
 
     # Retorna o objeto contendo a mensagem
     return msg
 
-def send_email(msg: EmailMessage, sender: str, password: str, receiver: list) -> None:
+def send_email(msg: EmailMessage, sender: str, password: str, receiver: list[str]) -> None:
     """
     Envia a mensagem para o e-mail dado
 
@@ -115,7 +137,21 @@ def send_email(msg: EmailMessage, sender: str, password: str, receiver: list) ->
         # Envia a mensagem para o destinatário
         server.sendmail(sender, receiver, msg.as_string())
 
-def notify(data_mor: pd.DataFrame, person_id: list) -> None:
+def get_email_data() -> tuple[str, str]:
+    """
+    Extrai os dados de e-mail do bot
+
+    :return: tuple[str, str], e-mail e senha do bot
+    """
+
+    # Extrai os dados de login do bot
+    api_email = "bot.entregash8@gmail.com"
+    api_password = st.secrets["email_password"]
+    
+    return api_email, api_password
+ 
+
+def notify(data_mor: pd.DataFrame, person_id: list[str]) -> None:
     """
     Processa e envia a notificação para a pessoa encontrada
 
@@ -124,17 +160,34 @@ def notify(data_mor: pd.DataFrame, person_id: list) -> None:
     :return: None
     """
 
-    # Extrai os dados de login do bot
-    api_email = "bot.entregash8@gmail.com"
-    api_password = st.secrets["email_password"]
-
+    # Extrai os dados de e-mail do bot
+    api_email, api_password = get_email_data()
+   
     # Extrai os dados da pessoa notificada
     target_email = get_address(data_mor, person_id)
     primeiro_nome, dados, tipo = get_data(data_mor, person_id)
     person = {"primeiro_nome": primeiro_nome, "dados": dados, "tipo": tipo}
 
+    # Cria o conteúdo da mensagem de notificação
+    content = create_notification_message(person)
+
     # Cria a mensagem a ser enviada
-    msg = get_message(api_email, target_email, person)
+    msg = get_message(api_email, target_email, content, subject="Notificação de Entrega")
 
     # Envia a mensagem ao destinatário
     send_email(msg, api_email, api_password, target_email)
+
+def notify_error(error: Exception) -> None:
+    """
+    Notifica o desenvolvedor de um erro ocorrido durante a execução
+
+    :param error: Exception, a exceção que ocorreu
+    :return: None
+    """
+
+    api_email, api_password = get_email_data()
+    content = create_error_message(error)
+    email_dev = st.secrets["email_dev"]
+    msg = get_message(api_email, [email_dev], content, subject="Notificação de Erro")
+    
+    send_email(msg, api_email, api_password, [email_dev])
