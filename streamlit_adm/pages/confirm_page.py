@@ -7,7 +7,7 @@ from random import randint
 
 sys.path.append("..")
 from session_state import get_session_state, set_session_state
-from send_email import notify
+from send_email import notify, notify_error
 from database import update_database
 from sheets import get_data_from_sheets
 
@@ -172,11 +172,18 @@ def main():
     # Se o botão de confirmação for pressionado
     if confirm_button:
         with st.spinner("Enviando..."):
-            # Salva a entrega na base de dados
-            update_database(data_mor, person_id, get_session_state("func_id"), ent_id)
+            try:
+                # Salva a entrega na base de dados
+                update_database(data_mor, person_id, get_session_state("func_id"), ent_id)
 
-            # Envia um e-mail ao destinatário
-            notify(data_mor, person_id)
+                # Envia um e-mail ao destinatário
+                notify(data_mor, person_id)
+
+            except Exception as err:
+                # Se ocorrer um erro, notifica o desenvolvedor
+                notify_error(err)
+                st.error(f"Erro ao enviar a notificação: {err}")
+                raise err
 
         # Envia a mensagem de sucesso
         set_session_state("sent_message", "Cadastro de entrega realizado com sucesso!")
