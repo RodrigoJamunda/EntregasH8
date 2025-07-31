@@ -181,7 +181,7 @@ def main():
 
             except Exception as err:
                 # Se ocorrer um erro, notifica o desenvolvedor
-                notify_error(err)
+                notify_error(err, person_id)
                 st.error(f"Erro ao enviar a notificação: {err}")
                 raise err
 

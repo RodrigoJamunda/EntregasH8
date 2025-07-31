@@ -81,13 +81,22 @@ def create_notification_message(person: dict[str, str]) -> MIMEText:
     
     return content
 
-def create_error_message(error: Exception) -> MIMEText:
+def create_error_message(error: Exception, person_id: list[int]) -> MIMEText:
+    """
+    Cria um objeto contendo a mensagem de erro
+    
+    :param error: Exception, a exceção que ocorreu
+    :param person_id: int, ID da pessoa que estava sendo notificada quando o erro ocorreu
+    :return: MIMEText, conteúdo da mensagem de erro
+    """
+
     with open(r"streamlit_adm/error_template.txt", "r") as content_message:
         content = MIMEText(content_message.read().format(
             time=datetime.now().strftime("%d/%m/%Y %H:%M:%S"),
             error_name=type(error).__name__,
             error=str(error),
-            stack_trace=traceback.format_exc()
+            stack_trace=traceback.format_exc(),
+            person=person_id
         ), "html")
     
     return content
@@ -177,17 +186,19 @@ def notify(data_mor: pd.DataFrame, person_id: list[str]) -> None:
     # Envia a mensagem ao destinatário
     send_email(msg, api_email, api_password, target_email)
 
-def notify_error(error: Exception) -> None:
+def notify_error(error: Exception, person_id: list[int]) -> None:
     """
     Notifica o desenvolvedor de um erro ocorrido durante a execução
 
     :param error: Exception, a exceção que ocorreu
+    :param person_id: int, ID da pessoa que estava sendo notificada quando o erro ocorreu
     :return: None
     """
 
     api_email, api_password = get_email_data()
-    content = create_error_message(error)
+    content = create_error_message(error, person_id)
     email_dev = st.secrets["email_dev"]
     msg = get_message(api_email, [email_dev], content, subject="Notificação de Erro")
     
+    print("aaaa")
     send_email(msg, api_email, api_password, [email_dev])
