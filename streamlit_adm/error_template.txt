@@ -26,6 +26,8 @@
         <p>STACK TRACE</p>
         
         <p>{stack_trace}</p>
+        
+        <p>PERSON_ID: {person}</p>
     </div>
 </body>
 
