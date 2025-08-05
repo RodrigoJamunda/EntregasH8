@@ -6,11 +6,12 @@
 
     <style>
         .text{{
-            font-size: 12pt;
             font-family: Roboto;
+            font-size: 12pt;
         }}
 
         .dados {{
+            font-family: Roboto;
             font-size: 14pt;
             border:solid;
             padding: 6px 40px 15px 40px;
@@ -18,6 +19,7 @@
         }}
 
         .footnote {{
+            font-family: Roboto;
             font-size: 8pt;
             color: gray;
         }}
@@ -26,7 +28,7 @@
   </head>
 
   <body>
-    <div class=text>
+    <div class="text">
     <p>Ola&#769;, {primeiro_nome}.</p>
 
     <p>Informamos que uma entrega {tipo} foi recebida e esta&#769; guardada na sala da ADM.</p>
@@ -34,20 +36,20 @@
     <br>
     </div>
 
-    <div class=dados>
+    <div class="dados">
     <p><b>DADOS DA ENTREGA</b><br>
     <br>{dados}</p>
     </div>
     <br><br>
 
-    <div class=text>
+    <div class="text">
     <p>Por gentileza, va&#769; ate&#769; a ADM do H8, de segunda a sexta-feira entre 9h e 17h, para retirar o pedido.</p>
 
     <br><p>Atenciosamente, <br>Cap. Chrystian<br> Chefe da ADM</p>
     </div>
 
     <br><br>
-    <div class=footnote>
+    <div class="footnote">
     <p>Este e&#769; um e-mail automa&#769;tico disparado pelo sistema. Favor na&#771;o responde&#770;-lo, pois esta conta na&#771;o e&#769; monitorada.</p>
     </div>
   </body>
