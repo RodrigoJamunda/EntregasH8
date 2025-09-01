@@ -174,3 +174,6 @@ secrets.toml
 
 # Temp files
 temp
+
+# Dev Container
+.devcontainer
